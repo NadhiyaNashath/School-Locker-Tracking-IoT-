@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { FaBoxOpen, FaBox } from "react-icons/fa"; 
-import { useNavigate } from "react-router-dom"; 
+import { FaBoxOpen, FaBox } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2"; // Import SweetAlert2
 
 const SuccessPage = () => {
-  const isLockerEmpty = false; 
-  const navigate = useNavigate(); 
+  const isLockerEmpty = false;
+  const navigate = useNavigate();
 
   // State to store activity logs with dummy data
   const [activityLogs, setActivityLogs] = useState([
@@ -17,7 +18,16 @@ const SuccessPage = () => {
   const handleLockDoor = () => {
     const timestamp = new Date().toLocaleString();
     logActivity("Locker door is locked", timestamp);
-    navigate("/"); 
+
+    // Display SweetAlert when the door is locked
+    Swal.fire({
+      title: "Success!",
+      text: "Locker door is locked.",
+      icon: "success",
+      confirmButtonText: "OK",
+    }).then(() => {
+      navigate("/");
+    });
   };
 
   // Function to log activity with timestamp
@@ -28,7 +38,6 @@ const SuccessPage = () => {
     ]);
   };
 
-  
   const getActionStyle = (action) => {
     switch (action) {
       case "unlocked":
@@ -41,7 +50,6 @@ const SuccessPage = () => {
         return "bg-gray-100 text-gray-700 border border-gray-600";
     }
   };
-  
 
   return (
     <div className="">
@@ -71,35 +79,34 @@ const SuccessPage = () => {
           </button>
         </div>
 
-                {/* Activity Log Table */}
-                <div className="mt-8 ">
-        <h2 className="text-2xl font-semibold text-gray-800">Activity Log</h2>
-        <div className="overflow-x-auto p-4">
+        {/* Activity Log Table */}
+        <div className="mt-8 ">
+          <h2 className="text-2xl font-semibold text-gray-800">Activity Log</h2>
+          <div className="overflow-x-auto p-4">
             <table className="mt-4 table-auto bg-white rounded-lg w-[800px] mx-auto rounded-lg shadow-md ">
-            <thead>
+              <thead>
                 <tr className="border-b">
-                <th className="px-4 py-2 text-center text-gray-600">Timestamp</th>
-                <th className="px-4 py-2 text-center text-gray-600">Action</th>
+                  <th className="px-4 py-2 text-center text-gray-600">Timestamp</th>
+                  <th className="px-4 py-2 text-center text-gray-600">Action</th>
                 </tr>
-            </thead>
-            <tbody>
+              </thead>
+              <tbody>
                 {activityLogs.map((log, index) => (
-                <tr key={index} className="border-b">
+                  <tr key={index} className="border-b">
                     <td className="px-4 py-2 text-gray-700">{log.timestamp}</td>
                     <td className="px-4 py-2 text-xs">
-                    <span
+                      <span
                         className={`inline-block px-3 py-1 rounded-2xl ${getActionStyle(log.action)}`}
-                    >
+                      >
                         {log.action}
-                    </span>
+                      </span>
                     </td>
-                </tr>
+                  </tr>
                 ))}
-            </tbody>
+              </tbody>
             </table>
+          </div>
         </div>
-        </div>
-
       </div>
     </div>
   );
