@@ -1,0 +1,17 @@
+.door {
+    width: 100px;
+    height: 200px;
+    background-color: #8B4513;
+    position: relative;
+    margin: 20px auto;
+    transition: transform 1s ease-in-out;
+  }
+  
+  .door.open {
+    transform: rotateY(120deg); /* Simulate door opening */
+  }
+  
+  .door.closed {
+    transform: rotateY(0deg); /* Closed state */
+  }
+  
