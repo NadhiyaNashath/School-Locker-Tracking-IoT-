@@ -16,8 +16,8 @@ const LockerDashboard = () => {
     setErrorMessage("");
     setIsLoading(true);
 
-    if (password !== DUMMY_PASSWORD) {
-      setErrorMessage("Incorrect Password. Please try again.");
+    if (password !== DUMMY_PASSWORD) { //need to change the logic when arduino connected
+      setErrorMessage("Incorrect Password. Please try again."); 
       setIsLoading(false);
       return;
     }
