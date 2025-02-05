@@ -12,29 +12,38 @@ const LockerDashboard = () => {
   const DUMMY_PASSWORD = "1234"; // Dummy password stored in the file
   const navigate = useNavigate();
 
-  const handleUnlock = () => {
+  const handleUnlock = async () => {
     setErrorMessage("");
     setIsLoading(true);
-
-    if (password !== DUMMY_PASSWORD) { //need to change the logic when arduino connected
-      setErrorMessage("Incorrect Password. Please try again."); 
+  
+    try {
+      const response = await fetch("http://10.22.54.116/unlock", { // Replace with ESP32 IP
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({ password }),
+      });
+  
+      const result = await response.text();
+  
+      if (response.ok && result === "Unlocked") {
+        setLockerStatus("Unlocked");
+        Swal.fire("Success!", "Locker unlocked successfully.", "success").then(() => {
+          navigate("/success");
+        });
+      } else {
+        setErrorMessage("Incorrect Password. Please try again.");
+      }
+    } catch (error) {
+      console.error(error);
+      setErrorMessage("Failed to connect to the locker. Try again.");
+    } finally {
       setIsLoading(false);
-      return;
     }
-
-    setLockerStatus("Unlocked");
-    setIsUnlocking(true);
-
-    
-    Swal.fire({
-      title: "Success!",
-      text: "Locker unlocked successfully.",
-      icon: "success",
-      confirmButtonText: "OK",
-    }).then(() => {
-      navigate("/success");
-    });
   };
+  
+  
 
   return (
     <div

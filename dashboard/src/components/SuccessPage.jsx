@@ -24,21 +24,34 @@ const SuccessPage = () => {
       });
   }, []);
 
-  const handleLockDoor = () => {
+  const handleLockDoor = async () => {
     const timestamp = new Date().toLocaleString();
-
-    logActivity("Locker door is locked", timestamp);
-
-    // Display SweetAlert when the door is locked
-    Swal.fire({
-      title: "Success!",
-      text: "Locker door is locked.",
-      icon: "success",
-      confirmButtonText: "OK",
-    }).then(() => {
-      navigate("/");
-    });
+  
+    try {
+      // Send request to ESP32 to lock the door
+      const response = await axios.post("http://10.22.54.116/lock");
+  
+      if (response.status === 200 && response.data === "Locked") {
+        // Log the activity only if the locker was successfully locked
+        await logActivity("locked", timestamp);
+  
+        Swal.fire({
+          title: "Success!",
+          text: "Locker door is locked.",
+          icon: "success",
+          confirmButtonText: "OK",
+        }).then(() => {
+          navigate("/");
+        });
+      } else {
+        Swal.fire("Error", "Failed to lock the door. Try again.", "error");
+      }
+    } catch (error) {
+      console.error("Error locking door:", error);
+      Swal.fire("Error", "Could not connect to the locker. Try again.", "error");
+    }
   };
+  
 
   // Function to log activity to the database
   const logActivity = async (action, timestamp) => {
