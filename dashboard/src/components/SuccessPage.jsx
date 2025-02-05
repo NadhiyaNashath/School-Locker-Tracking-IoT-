@@ -5,10 +5,10 @@ import Swal from "sweetalert2";
 import { motion, AnimatePresence } from "framer-motion";
 
 const SuccessPage = () => {
-  const isLockerEmpty = false;
+  const isLockerEmpty = false; //data should be collected from the ultra sonic sensor 
   const navigate = useNavigate();
 
-  // State to store activity logs with dummy data
+  // State to store activity logs with dummy data (remove this if not needed)
   const [activityLogs, setActivityLogs] = useState([
     { action: "unlocked", timestamp: "2025-02-04 10:00 AM" },
     { action: "item added", timestamp: "2025-02-04 10:15 AM" },
