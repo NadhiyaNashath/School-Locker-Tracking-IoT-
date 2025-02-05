@@ -1,23 +1,32 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaBoxOpen, FaBox } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2"; 
 import { motion, AnimatePresence } from "framer-motion";
+import axios from "axios"; 
 
 const SuccessPage = () => {
-  const isLockerEmpty = false; //data should be collected from the ultra sonic sensor 
+  const isLockerEmpty = false; // Replace this with actual data from the ultra sonic sensor
   const navigate = useNavigate();
+  const [activityLogs, setActivityLogs] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // State to store activity logs with dummy data (remove this if not needed)
-  const [activityLogs, setActivityLogs] = useState([
-    { action: "unlocked", timestamp: "2025-02-04 10:00 AM" },
-    { action: "item added", timestamp: "2025-02-04 10:15 AM" },
-    { action: "wrong password", timestamp: "2025-02-04 10:20 AM" },
-    { action: "locked", timestamp: "2025-02-04 10:30 AM" },
-  ]);
+  // Fetch activity logs from database when component mounts
+  useEffect(() => {
+    axios.get("http://localhost:5000/api/logs") // Replace with your API URL
+      .then(response => {
+        setActivityLogs(response.data);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error("Error fetching logs:", error);
+        setLoading(false);
+      });
+  }, []);
 
   const handleLockDoor = () => {
     const timestamp = new Date().toLocaleString();
+
     logActivity("Locker door is locked", timestamp);
 
     // Display SweetAlert when the door is locked
@@ -31,9 +40,19 @@ const SuccessPage = () => {
     });
   };
 
-  // Function to log activity with timestamp
-  const logActivity = (action, timestamp) => {
-    setActivityLogs((prevLogs) => [{ action, timestamp }, ...prevLogs]);
+  // Function to log activity to the database
+  const logActivity = async (action, timestamp) => {
+    try {
+      const newLog = { action, timestamp };
+
+      // Send log to database
+      await axios.post("http://localhost:5000/api/logs", newLog); // Replace with your API URL
+      
+      // Update local state
+      setActivityLogs((prevLogs) => [newLog, ...prevLogs]);
+    } catch (error) {
+      console.error("Error saving log:", error);
+    }
   };
 
   const getActionStyle = (action) => {
@@ -54,6 +73,7 @@ const SuccessPage = () => {
       <h1 className="text-3xl font-bold text-green-500">
         Locker Unlocked Successfully!
       </h1>
+
       <div className="mt-4 bg-white p-6 rounded-lg shadow-lg max-w-md mx-auto h-[200px] flex items-center justify-center">
         <AnimatePresence mode="wait">
           {isLockerEmpty ? (
@@ -98,32 +118,36 @@ const SuccessPage = () => {
       <div className="mt-8">
         <h2 className="text-2xl font-semibold text-gray-800">Activity Log</h2>
         <div className="overflow-x-auto p-4">
-          <table className="mt-4 table-auto bg-white rounded-lg w-[800px] mx-auto shadow-md">
-            <thead>
-              <tr className="border-b">
-                <th className="px-4 py-2 text-center text-gray-600">
-                  Timestamp
-                </th>
-                <th className="px-4 py-2 text-center text-gray-600">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {activityLogs.map((log, index) => (
-                <tr key={index} className="border-b">
-                  <td className="px-4 py-2 text-gray-700">{log.timestamp}</td>
-                  <td className="px-4 py-2 text-xs">
-                    <span
-                      className={`inline-block px-3 py-1 rounded-2xl ${getActionStyle(
-                        log.action
-                      )}`}
-                    >
-                      {log.action}
-                    </span>
-                  </td>
+          {loading ? (
+            <p className="text-gray-600">Loading logs...</p>
+          ) : (
+            <table className="mt-4 table-auto bg-white rounded-lg w-[800px] mx-auto shadow-md">
+              <thead>
+                <tr className="border-b">
+                  <th className="px-4 py-2 text-center text-gray-600">
+                    Timestamp
+                  </th>
+                  <th className="px-4 py-2 text-center text-gray-600">Action</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {activityLogs.map((log, index) => (
+                  <tr key={index} className="border-b">
+                    <td className="px-4 py-2 text-gray-700">{log.timestamp}</td>
+                    <td className="px-4 py-2 text-xs">
+                      <span
+                        className={`inline-block px-3 py-1 rounded-2xl ${getActionStyle(
+                          log.action
+                        )}`}
+                      >
+                        {log.action}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>
