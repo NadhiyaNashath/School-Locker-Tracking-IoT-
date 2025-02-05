@@ -1,8 +1,6 @@
 import React, { useState } from "react";
-import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import Swal from "sweetalert2"; // Import SweetAlert2
-import { FaDoorOpen } from 'react-icons/fa';
+import Swal from "sweetalert2"; 
 
 const LockerDashboard = () => {
   const [password, setPassword] = useState("");
@@ -27,7 +25,7 @@ const LockerDashboard = () => {
     setLockerStatus("Unlocked");
     setIsUnlocking(true);
 
-    // Display SweetAlert on successful unlock
+    
     Swal.fire({
       title: "Success!",
       text: "Locker unlocked successfully.",
